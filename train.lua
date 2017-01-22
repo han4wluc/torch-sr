@@ -26,34 +26,21 @@ sgd_params = {
    momentum = 0
 }
 
-params = {
-    sgd_params = sgd_params,
-    model = model,
-    criterion = criterion,
-    data_train = data_train,
-    labels_train = labels_train,
-
-    num_of_epochs = 1,
-    batch_size = 20,
-    model_name = 'srcnn_test'
-}
-
 model_names = {"srnn_9_1_6", "srnn_9_5_6"}
 
 for i, model_name in ipairs(model_names) do
-    params = {
+    local params = {
         sgd_params = sgd_params,
         model = models[model_name].model,
         criterion = criterion,
         data_train = data_train,
         labels_train = labels_train,
 
-        num_of_epochs = 1,
+        num_of_epochs = 20,
         batch_size = 20,
         -- model_name = 'srcnn_test'
         model_name = model_name
     }
-
 
     utils.start_training(params)
 

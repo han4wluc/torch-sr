@@ -6,12 +6,11 @@ function validate(model_name, data)
     local model = torch.load(model_dir .. 'model.t7')
 
     m = data:size()[1]
-    res = model:forward(data):resize(m,3,102,102)
 
     os.execute('mkdir -p ' .. images_dir)
 
     for i=1, m do
-        local img = res[i]
+        local img = model:forward(data[i]):resize(3,102,102)
         image.save(images_dir .. 'img_' .. tostring(i) .. '.jpg', img)
     end
     

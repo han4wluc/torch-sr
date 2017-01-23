@@ -27,7 +27,7 @@ for i, model_name in ipairs(model_names) do
         data_train = data_train,
         labels_train = labels_train,
 
-        num_of_epochs = 1,
+        num_of_epochs = 80,
         batch_size = 20,
 
         model_name = model_name

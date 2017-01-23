@@ -24,8 +24,8 @@ require 'utils'
 
 labels_train, labels_validation, data_train, data_validation = utils.load_data()
 
-model_names = {"srcnn_test"}
+model_names = {"srnn_9_1_6", "srnn_9_5_6"}
 
 for i, model_name in ipairs(model_names) do
-  validate(model_name, data_train)
+  validate(model_name, data_validation)
 end

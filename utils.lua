@@ -104,7 +104,6 @@ function utils.start_training(params)
         local t = sys.clock()
         sys.tic()
 
-
     --  mini-batch SGD
         for n=1,n_of_batches do
             start = batch_size * (n-1) + 1
@@ -113,8 +112,8 @@ function utils.start_training(params)
             label_batch = labels_train[{{start,finish}}]
             _, fs = optim.sgd(feval,x,sgd_params)
             current_loss = current_loss + (fs[1]/batch_size)
-            table.insert(losses, current_loss)
         end
+        table.insert(losses, current_loss)
 
 
 --         if epoch % 10 == 0 then

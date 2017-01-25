@@ -68,6 +68,7 @@ function utils.start_training(params)
     local labels_train = params.labels_train
     local num_of_epochs = params.num_of_epochs
     local batch_size = params.batch_size
+    local resume_training = params.resume_training
     
 
     x, dl_params = model:getParameters()
@@ -86,6 +87,10 @@ function utils.start_training(params)
       local loss = criterion:forward(outputs, label_batch)
       local dloss_doutputs = criterion:backward(outputs, label_batch)
       model:backward(data_batch, dloss_doutputs)
+
+      -- print(dl_params)
+      dl_params:clamp(-0.5,0.5)
+
       return loss, dl_params
 
     end
@@ -95,8 +100,21 @@ function utils.start_training(params)
 --     batch_size = 20
     n_of_batches = math.floor(m/batch_size)
 
+    result_dir = 'results/'..model_name
+    model_path = result_dir .. '/model.t7'
+    losses_path = result_dir .. '/losses.txt'
+    os.execute('mkdir -p ' .. result_dir)
+    if not resume_training then
+      os.execute('rm -f ' .. losses_path)
+    end
+    total_duration = 0
+    
+
     print('start training ' .. model_name)
     print('epoch', 'duration', 'loss')
+    losses_file = io.open(losses_path, 'a')
+    losses_file:write('epoch\tduration\tloss')
+    losses_file:close()
     local losses = {}
     for epoch = 1, num_of_epochs do
         
@@ -112,6 +130,7 @@ function utils.start_training(params)
             label_batch = labels_train[{{start,finish}}]
             _, fs = optim.sgd(feval,x,sgd_params)
             current_loss = current_loss + (fs[1]/batch_size)
+            -- print(fs[2])
         end
         table.insert(losses, current_loss)
 
@@ -120,10 +139,14 @@ function utils.start_training(params)
 
     --      log results
 
-            t = sys.toc() 
+            t = sys.toc()
+            total_duration = total_duration + t
             duration = math.floor(t)..'s'
 
             print(epoch, duration, current_loss)
+            losses_file = io.open(losses_path, 'a')
+            losses_file:write('\n' .. epoch .. '\t' .. duration .. '\t' .. current_loss)
+            losses_file:close()
 --             logger:add{['training error'] = current_loss}
 --             logger:style{['training error'] = '-'}
 --             logger:plot()
@@ -136,18 +159,20 @@ function utils.start_training(params)
 
 --         end
     end
-    
-    result_dir = 'results/'..model_name
-    model_path = result_dir .. '/model.t7'
-    losses_path = result_dir .. '/losses.t7'
-    os.execute('mkdir -p ' .. result_dir)
+    losses_file = io.open(losses_path, 'a')
+    losses_file:write('\nTotal Duration: ' .. math.floor(total_duration)..'s')
+    losses_file:close()
+    model:clearState() -- clear intermediate parameters
     torch.save(model_path, model)
     print('model saved')
-    torch.save(losses_path, losses)
-    print('losses saved')
+    -- torch.save(losses_path, losses)
+    -- print('losses saved')
 end
 
 
+function utils.get_model_names()
+  return {"srnn_9_1_6", "srnn_9_5_6"}
+end
 
 
 

@@ -18,13 +18,11 @@ function validate(model_name, data)
     
 end
 
--- image = require 'image'
--- require 'nn'
-require 'utils' 
+require 'utils'
 
 labels_train, labels_validation, data_train, data_validation = utils.load_data()
 
-model_names = {"srnn_9_1_6", "srnn_9_5_6"}
+model_names = utils.get_model_names()
 
 for i, model_name in ipairs(model_names) do
   validate(model_name, data_validation)

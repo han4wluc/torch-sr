@@ -8,6 +8,18 @@ models = {}
 
 -- difference between paper: use padding and 3rd layer filter size 6 to keep 2x sizing.
 
+srnn_3_2 = {}
+srnn_3_2.name = 'srnn_3_2'
+srnn_3_2.model = nn.Sequential()
+srnn_3_2.model:add(nn.SpatialConvolution(3,16,3,3,1,1,1,1))
+-- srnn_3_2.model:add(nn.SpatialBatchNormalization(16))
+srnn_3_2.model:add(nn.LeakyReLU(0.2))
+srnn_3_2.model:add(nn.SpatialFullConvolution(16, 3, 2, 2, 2, 2, 0, 0, 0, 0))
+-- srnn_3_2.model:add(nn.SpatialBatchNormalization(3))
+-- srnn_3_2.model:add(nn.LeakyReLU(0.2))
+-- srnn_3_2.model:add(nn.View(3*102*102))
+-- srnn_3_2.model:add(nn.Tanh())
+
 srnn_9_1_6 = {}
 srnn_9_1_6.name = 'srnn_9_1_6'
 srnn_9_1_6.model = nn.Sequential()
@@ -18,7 +30,6 @@ srnn_9_1_6.model:add(nn.ReLU())
 srnn_9_1_6.model:add(nn.SpatialFullConvolution(32,3,6,6,2,2,2,2))
 srnn_9_1_6.model:add(nn.ReLU())
 
-
 srnn_9_5_6 = {}
 srnn_9_5_6.name = 'srnn_9_5_6'
 srnn_9_5_6.model = nn.Sequential()
@@ -28,7 +39,6 @@ srnn_9_5_6.model:add(nn.SpatialConvolution(64,32,5,5,1,1,2,2))
 srnn_9_5_6.model:add(nn.ReLU())
 srnn_9_5_6.model:add(nn.SpatialFullConvolution(32,3,6,6,2,2,2,2))
 srnn_9_5_6.model:add(nn.ReLU())
-
 
 -- Real-Time Single Image and Video Super-Resolution Using an Efficient Sub-Pixel Convolutional Neural Network
 -- Wenzhe Shi, Jose Caballero, Ferenc Huszár, Johannes Totz, Andrew P. Aitken, Rob Bishop, Daniel Rueckert, Zehan Wang
@@ -53,8 +63,9 @@ srnn_9_5_6.model:add(nn.ReLU())
 -- Nov 2016
 -- https://arxiv.org/abs/1609.04802
 
-
 models.srnn_9_1_6 = srnn_9_1_6
 models.srnn_9_5_6 = srnn_9_5_6
+models.srnn_3_2 = srnn_3_2
+
 
 return models

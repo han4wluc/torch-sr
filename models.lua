@@ -16,9 +16,9 @@ srnn_3_2.model:add(nn.SpatialConvolution(3,16,3,3,1,1,1,1))
 srnn_3_2.model:add(nn.LeakyReLU(0.2))
 srnn_3_2.model:add(nn.SpatialFullConvolution(16, 3, 2, 2, 2, 2, 0, 0, 0, 0))
 -- srnn_3_2.model:add(nn.SpatialBatchNormalization(3))
--- srnn_3_2.model:add(nn.LeakyReLU(0.2))
+srnn_3_2.model:add(nn.LeakyReLU(0.2))
 -- srnn_3_2.model:add(nn.View(3*102*102))
--- srnn_3_2.model:add(nn.Tanh())
+srnn_3_2.model:add(nn.Tanh())
 
 srnn_9_1_6 = {}
 srnn_9_1_6.name = 'srnn_9_1_6'

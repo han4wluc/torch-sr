@@ -69,6 +69,7 @@ function utils.start_training(params)
     local num_of_epochs = params.num_of_epochs
     local batch_size = params.batch_size
     local resume_training = params.resume_training
+    local lr_theta = params.lr_theta
     
 
     x, dl_params = model:getParameters()
@@ -89,7 +90,9 @@ function utils.start_training(params)
       model:backward(data_batch, dloss_doutputs)
 
       -- print(dl_params)
-      dl_params:clamp(-0.5,0.5)
+      if lr_theta ~= nil then
+        dl_params:clamp(-lr_theta,lr_theta)
+      end
 
       return loss, dl_params
 
@@ -111,13 +114,14 @@ function utils.start_training(params)
     
 
     print('start training ' .. model_name)
-    print('epoch', 'duration', 'loss')
+    print('epoch', 'duration', 'loss', 'current_learning_rate')
     losses_file = io.open(losses_path, 'a')
     losses_file:write('epoch\tduration\tloss')
     losses_file:close()
     local losses = {}
     for epoch = 1, num_of_epochs do
-        
+
+
         local current_loss = 0
         local t = sys.clock()
         sys.tic()
@@ -126,10 +130,14 @@ function utils.start_training(params)
         for n=1,n_of_batches do
             start = batch_size * (n-1) + 1
             finish = batch_size * n
+            -- print(start, finish)
             data_batch = data_train[{{start,finish}}]
             label_batch = labels_train[{{start,finish}}]
             _, fs = optim.sgd(feval,x,sgd_params)
-            current_loss = current_loss + (fs[1]/batch_size)
+            -- print()
+            -- current_loss = current_loss + (fs[1]/batch_size)
+            current_loss = current_loss + (fs[1]/n_of_batches)
+
             -- print(fs[2])
         end
         table.insert(losses, current_loss)
@@ -142,27 +150,29 @@ function utils.start_training(params)
             t = sys.toc()
             total_duration = total_duration + t
             duration = math.floor(t)..'s'
+            local clr = sgd_params.learningRate / (1 + sgd_params.evalCounter*sgd_params.learningRateDecay)
 
-            print(epoch, duration, current_loss)
+            print(epoch, duration, current_loss, clr)
             losses_file = io.open(losses_path, 'a')
-            losses_file:write('\n' .. epoch .. '\t' .. duration .. '\t' .. current_loss)
+            losses_file:write('\n' .. epoch .. '\t' .. duration .. '\t' .. current_loss .. '\t' .. clr)
             losses_file:close()
 --             logger:add{['training error'] = current_loss}
 --             logger:style{['training error'] = '-'}
 --             logger:plot()
 
 --     --      save model
---             if epoch % 50 == 0 then
---                 torch.save('./models/model.t7', model)
---                 print('model saved')
---             end
+            if epoch % 2 == 0 then
+                model:clearState()
+                torch.save(model_path, model)
+                print('model saved')
+            end
 
 --         end
     end
     losses_file = io.open(losses_path, 'a')
     losses_file:write('\nTotal Duration: ' .. math.floor(total_duration)..'s')
     losses_file:close()
-    model:clearState() -- clear intermediate parameters
+    model:clearState() -- clear intermediate parameters, much smaller file size
     torch.save(model_path, model)
     print('model saved')
     -- torch.save(losses_path, losses)
@@ -171,7 +181,8 @@ end
 
 
 function utils.get_model_names()
-  return {"srnn_9_1_6", "srnn_9_5_6"}
+  return {"srnn_9_1_6"}
+  -- return {"srnn_3_2"}
 end
 
 

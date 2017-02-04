@@ -8,6 +8,7 @@ torch.manualSeed(0)
 labels_train, labels_validation, data_train, data_validation = utils.load_data()
 
 criterion = nn.MSECriterion()
+-- criterion.sizeAverage = false
 
 models = require 'models'
 
@@ -43,9 +44,10 @@ for i, model_name in ipairs(model_names) do
         labels_train = labels_train,
         resume_training = resume_training,
 
-        num_of_epochs = 200,
-        batch_size = 50,
-        lr_theta = 2e-3,
+        num_of_epochs = 2000,
+        batch_size = 70,
+        -- batch_size = 100,
+        -- lr_theta = 0.5, -- used for gradient clipping
 
         model_name = model_name
     }
